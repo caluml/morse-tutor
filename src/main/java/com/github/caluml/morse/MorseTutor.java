@@ -12,35 +12,41 @@ import java.util.Set;
 
 public class MorseTutor implements KeyListener {
 
-    private static final int DIT = 50;
+    private static int DIT = 50;
     private static final int DAH = DIT * 3;
-    private static final int GAP = 50;
+    private static final int GAP = DIT;
+
+    private final Tone tone;
 
     private long start;
     private Character random;
     private SourceDataLine line;
 
-    private java.lang.Object exit = new Object();
-
     private Map<Character, Integer> wrong = new HashMap<Character, Integer>();
     private Map<Character, ArrayList<Integer>> right = new HashMap<Character, ArrayList<Integer>>();
+    private long totalStart;
+
+    public MorseTutor(int ditLength, Tone tone) {
+        this.DIT = ditLength;
+        this.tone = tone;
+    }
 
     public void run() {
         try {
             startGUI();
 
-            final AudioFormat af = new AudioFormat(Note.SAMPLE_RATE, 8, 1, true, true);
+            final AudioFormat af = new AudioFormat(Tone.SAMPLE_RATE, 8, 1, true, true);
             line = AudioSystem.getSourceDataLine(af);
-            line.open(af, Note.SAMPLE_RATE);
+            line.open(af, Tone.SAMPLE_RATE);
             line.start();
 
-
+            totalStart = System.currentTimeMillis();
             random = Symbols.getRandom();
             play(random);
             start = System.currentTimeMillis();
 
-            synchronized (exit) {
-                exit.wait();
+            synchronized (this) {
+                wait();
             }
 
             line.close();
@@ -54,14 +60,19 @@ public class MorseTutor implements KeyListener {
             System.out.println(m.getKey() + " wrong " + m.getValue() + " times");
         }
 
+        int totalChars = 0;
         for (Map.Entry<Character, ArrayList<Integer>> charTimings : right.entrySet()) {
             int sum = 0;
             for (int i : charTimings.getValue()) {
                 sum = sum + i;
+                totalChars++;
             }
             System.out.println("Average " + charTimings.getKey() + " = " +
                     ((float) sum / charTimings.getValue().size()) + " ms (" + charTimings.getValue().size() + ")");
         }
+
+        float minutes = (System.currentTimeMillis() - totalStart) / 60000f;
+        System.out.println(totalChars / minutes + " characters per minute");
 
         System.exit(0);
     }
@@ -83,19 +94,19 @@ public class MorseTutor implements KeyListener {
         String morse = Symbols.get(c);
         for (int i = 0; i < morse.length(); i++) {
             if ('-' == morse.charAt(i)) {
-                play(line, Note.A5, DAH);
+                play(line, tone.tone(), DAH);
             } else if ('.' == morse.charAt(i)) {
-                play(line, Note.A5, DIT);
+                play(line, tone.tone(), DIT);
             }
-            play(line, Note.REST, GAP);
+            play(line, tone.silence(), GAP);
         }
         line.drain();
     }
 
-    private void play(SourceDataLine line, Note note, int ms) {
-        ms = Math.min(ms, Note.SECONDS * 1000);
-        int length = Note.SAMPLE_RATE * ms / 1000;
-        line.write(note.data(), 0, length);
+    private void play(SourceDataLine line, byte[] audio, int ms) {
+        ms = Math.min(ms, Tone.SECONDS * 1000);
+        int length = Tone.SAMPLE_RATE * ms / 1000;
+        line.write(audio, 0, length);
     }
 
     @Override
@@ -104,8 +115,9 @@ public class MorseTutor implements KeyListener {
             // Repeat
             play(random);
         } else if ((int) keyEvent.getKeyChar() == 27) {
-            synchronized (exit) {
-                exit.notifyAll();
+            // Escape
+            synchronized (this) {
+                notifyAll();
             }
         } else if (keyEvent.getKeyChar() == random) {
             recordCorrect(random, (System.currentTimeMillis() - start));
