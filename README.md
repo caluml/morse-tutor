@@ -5,6 +5,11 @@ It doesn't help you learn the characters, and it doesn't help you send. But if y
 
 Learn the characters at https://en.wikipedia.org/wiki/Morse_code
 
+Requirements:
+   * Maven
+   * JDK (6+)
+   * Only tested on Linux
+
 Run with run.sh. Escape to exit, space to repeat a character.
 
 Limitations/Notes
