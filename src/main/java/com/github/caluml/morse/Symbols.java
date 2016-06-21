@@ -97,7 +97,7 @@ public class Symbols {
     }
 
     public static char getRandom() {
-        int r = random.nextInt(40);
+        int r = random.nextInt(41);
 
         if (r < 26) {
             // Letter
