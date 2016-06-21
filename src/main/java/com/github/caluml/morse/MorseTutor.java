@@ -1,20 +1,20 @@
 package com.github.caluml.morse;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.SourceDataLine;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MorseTutor implements KeyListener {
 
-    private static int DIT = 50;
-    private static final int DAH = DIT * 3;
-    private static final int GAP = DIT;
+    // https://en.wikipedia.org/wiki/Morse_code#Timing
+    private static float DIT = 50f;                 // milliseconds
+    private static final float DAH = DIT * 3.0f;    // dah weighting
+    private static final float GAP = 50f;           // Usually the same as a dit
 
     private final Tone tone;
 
@@ -67,12 +67,22 @@ public class MorseTutor implements KeyListener {
                 sum = sum + i;
                 totalChars++;
             }
-            System.out.println("Average " + charTimings.getKey() + " = " +
-                    ((float) sum / charTimings.getValue().size()) + " ms (" + charTimings.getValue().size() + ")");
+            System.out.println("Average for " + charTimings.getKey() + ": " +
+                    ((float) sum / charTimings.getValue().size()) + " ms (out of " + charTimings.getValue().size() + ")");
         }
 
-        float minutes = (System.currentTimeMillis() - totalStart) / 60000f;
-        System.out.println(totalChars / minutes + " characters per minute");
+        long end = System.currentTimeMillis();
+        float minutes = (end - totalStart) / 60000f;
+        System.out.println("Start:             " + new Date(totalStart));
+        System.out.println("End:               " + new Date(end));
+        System.out.println("Elapsed:           " + minutes + " minutes");
+        if (right.size() + wrong.size() > 0) {
+            System.out.println("Right:             " + right.size());
+            System.out.println("Wrong:             " + wrong.size());
+            System.out.println("% correct:         " + (100f / (right.size() + wrong.size())) * right.size());
+            System.out.println("Total chars/min:   " + totalChars / minutes);
+            System.out.println("Correct chars/min: " + right.size() / minutes);
+        }
 
         System.exit(0);
     }
@@ -103,10 +113,10 @@ public class MorseTutor implements KeyListener {
         line.drain();
     }
 
-    private void play(SourceDataLine line, byte[] audio, int ms) {
+    private void play(SourceDataLine line, byte[] audio, float ms) {
         ms = Math.min(ms, Tone.SECONDS * 1000);
-        int length = Tone.SAMPLE_RATE * ms / 1000;
-        line.write(audio, 0, length);
+        float length = Tone.SAMPLE_RATE * ms / 1000;
+        line.write(audio, 0, (int) length);
     }
 
     @Override
@@ -142,7 +152,6 @@ public class MorseTutor implements KeyListener {
     }
 
     private void recordCorrect(Character c, long ms) {
-        System.out.println(c + ": " + ms + " ms");
         ArrayList<Integer> list = right.get(c);
         if (list == null) list = new ArrayList<Integer>();
         list.add((int) ms);
