@@ -12,9 +12,9 @@ import java.util.*;
 public class MorseTutor implements KeyListener {
 
     // https://en.wikipedia.org/wiki/Morse_code#Timing
-    private static float DIT = 50f;                 // milliseconds
-    private static final float DAH = DIT * 3.0f;    // dah weighting
-    private static final float GAP = 50f;           // Usually the same as a dit
+    private final float dit;       // dit length in milliseconds
+    private final float dah;       // dah length in milliseconds
+    private final float gap;       // gap length in milliseconds - usually the same as a dit
 
     private final Tone tone;
 
@@ -24,35 +24,32 @@ public class MorseTutor implements KeyListener {
 
     private Map<Character, Integer> wrong = new HashMap<Character, Integer>();
     private Map<Character, ArrayList<Integer>> right = new HashMap<Character, ArrayList<Integer>>();
-    private long totalStart;
 
-    public MorseTutor(int ditLength, Tone tone) {
-        this.DIT = ditLength;
+    public MorseTutor(int dit, Tone tone) {
+        this.dit = dit;
+        this.dah = dit * 3.0f;
+        this.gap = dit;
         this.tone = tone;
     }
 
-    public void run() {
-        try {
-            startGUI();
+    public void run() throws Exception {
+        startGUI();
 
-            final AudioFormat af = new AudioFormat(Tone.SAMPLE_RATE, 8, 1, true, true);
-            line = AudioSystem.getSourceDataLine(af);
-            line.open(af, Tone.SAMPLE_RATE);
-            line.start();
+        final AudioFormat af = new AudioFormat(Tone.SAMPLE_RATE, 8, 1, true, true);
+        line = AudioSystem.getSourceDataLine(af);
+        line.open(af, Tone.SAMPLE_RATE);
+        line.start();
 
-            totalStart = System.currentTimeMillis();
-            random = Symbols.getRandom();
-            play(random);
-            start = System.currentTimeMillis();
+        long totalStart = System.currentTimeMillis();
+        random = Symbols.getRandom();
+        play(random);
+        start = System.currentTimeMillis();
 
-            synchronized (this) {
-                wait();
-            }
-
-            line.close();
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
+        synchronized (this) {
+            wait();
         }
+
+        line.close();
         System.out.println("Exiting thread");
 
         Set<Map.Entry<Character, Integer>> entries = wrong.entrySet();
@@ -104,11 +101,11 @@ public class MorseTutor implements KeyListener {
         String morse = Symbols.get(c);
         for (int i = 0; i < morse.length(); i++) {
             if ('-' == morse.charAt(i)) {
-                play(line, tone.tone(), DAH);
+                play(line, tone.tone(), dah);
             } else if ('.' == morse.charAt(i)) {
-                play(line, tone.tone(), DIT);
+                play(line, tone.tone(), dit);
             }
-            play(line, tone.silence(), GAP);
+            play(line, tone.silence(), gap);
         }
         line.drain();
     }
