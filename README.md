@@ -1,23 +1,60 @@
 # morse-tutor
 
-A simple app to help you get faster at copying Morse (CW).
-It doesn't help you learn the characters, and it doesn't help you send. But if you can receive successfully, you'll have no problem sending.
+## What is it?
+A simple app to help you get faster at copying (receiving) Morse (CW).
+
+## What isn't it?
+It doesn't help you learn the characters, and it doesn't help you send.
+Receiving is the hard part. If you can receive successfully, you'll have no problem sending.
 
 Learn the characters at https://en.wikipedia.org/wiki/Morse_code
 
-Requirements:
+## Build requirements
    * Maven
    * JDK (6+)
    * Only tested on Linux
 
-Run with run.sh. Escape to exit, space to repeat a character.
+## To build
+    * ```mvn clean compile```
 
-Limitations/Notes
-   * It's currently got hardcoded volume levels and dit-dah durations - I'm not quite sure what the equivalent WPM would be.
-See Note.java for the volume, and MorseTutor.java for the durations.
+## To run
+   * Either: ```mvn clean compile```, then ```./run.sh``` or
+   * Use the precompiled jar: ```java -jar 50 20 800```
+
+Escape to exit, space to repeat a character.
+
+## Stats
+It times how long it takes you to get the symbol correct.
+When you press escape, it gives you stats of:
+Which symbols you got wrong, and how many times.
+The average time for each symbol.
+Some overall stats. E.g.
+```Start:             Sat Jul 30 17:54:33 BST 2016
+End:               Sat Jul 30 17:57:09 BST 2016
+Elapsed:           2.6073666 minutes
+Right:             60
+Wrong:             15
+% correct:         80.0
+Total chars/min:   23.011724
+Correct chars/min: 23.011724```
+
+## Weighting
+Every time you get one wrong, it increases the symbol's weighting. When you get one right, it decreases the weighting.
+Letters are randomly picked, and the higher the symbol's weighting, the more likely it is to be selected.
+This will help you learn the symbols you get wrong most often.
+
+## Limitations/Notes
    * It uses a JFrame as I couldn't read a single key-press from stdin.
+   * It only uses Java 6, although there's some nice stuff in later versions that could make it nicer.
+   * It picks randomly, so it can pick the same symbol multiple times in a row.
+   * If you don't want to practice numbers, or punctuation, comment out the relevant lines in Symbols.java and rebuild.
 
-If you want some real Morse to listen to, there should be some around these frequencies (yes - people still use it)
+## Suggestions
+   * If you're learning to copy CW, don't learn the symbols slowly, and increase the speed. Start off with the "dit length" small so the characters are fast. Something of 40 or under is best. Then just work on getting the recognition time down.
+
+## Morse? In this day and age?
+Yes - people still use it.
+If you want some real Morse to listen to, there should be some around these frequencies
    * http://websdr.ewi.utwente.nl:8901/?tune=7028lsb (Look between 7.000 and 7.050)
    * http://websdr.ewi.utwente.nl:8901/?tune=14015usb (Look between 14.000 and 14.050)
 
