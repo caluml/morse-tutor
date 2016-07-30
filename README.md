@@ -9,13 +9,13 @@ Receiving is the hard part. If you can receive successfully, you'll have no prob
 
 Learn the characters at https://en.wikipedia.org/wiki/Morse_code
 
-## Build requirements
-   * Maven
-   * JDK (6+)
+## Requirements
+   * Maven (if building from source)
+   * JDK (6+) to build. JRE or JDK to run
    * Only tested on Linux
 
 ## To build
-    * ```mvn clean compile```
+```mvn clean compile```
 
 ## To run
    * Either: ```mvn clean compile```, then ```./run.sh``` or
@@ -29,14 +29,16 @@ When you press escape, it gives you stats of:
 Which symbols you got wrong, and how many times.
 The average time for each symbol.
 Some overall stats. E.g.
-```Start:             Sat Jul 30 17:54:33 BST 2016
+```
+Start:             Sat Jul 30 17:54:33 BST 2016
 End:               Sat Jul 30 17:57:09 BST 2016
 Elapsed:           2.6073666 minutes
 Right:             60
 Wrong:             15
 % correct:         80.0
 Total chars/min:   23.011724
-Correct chars/min: 23.011724```
+Correct chars/min: 23.011724
+```
 
 ## Weighting
 Every time you get one wrong, it increases the symbol's weighting. When you get one right, it decreases the weighting.
