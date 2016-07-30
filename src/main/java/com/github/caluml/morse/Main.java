@@ -1,5 +1,10 @@
 package com.github.caluml.morse;
 
+/**
+ * Morse Tutor.
+ * Helps "copying" code, which is the hardest thing.
+ * Uses weighting so picks characters you get wrong more often.
+ */
 public class Main {
 
     public static void main(String[] args) throws Exception {

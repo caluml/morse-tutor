@@ -19,7 +19,12 @@ public class MorseTutor implements KeyListener {
     private final Tone tone;
 
     private long start;
-    private Character random;
+
+    /**
+     * The randomly chosen symbol
+     */
+    private Symbol random;
+
     private SourceDataLine line;
 
     private Map<Character, Integer> wrong = new HashMap<Character, Integer>();
@@ -73,12 +78,14 @@ public class MorseTutor implements KeyListener {
         System.out.println("Start:             " + new Date(totalStart));
         System.out.println("End:               " + new Date(end));
         System.out.println("Elapsed:           " + minutes + " minutes");
-        if (right.size() + wrong.size() > 0) {
-            System.out.println("Right:             " + right.size());
-            System.out.println("Wrong:             " + wrong.size());
-            System.out.println("% correct:         " + (100f / (right.size() + wrong.size())) * right.size());
+        int numRight = getNumRight(right);
+        int numWrong = getNumWrong(wrong);
+        if (numRight + numWrong > 0) {
+            System.out.println("Right:             " + numRight);
+            System.out.println("Wrong:             " + numWrong);
+            System.out.println("% correct:         " + (100f / (numRight + numWrong)) * numRight);
             System.out.println("Total chars/min:   " + totalChars / minutes);
-            System.out.println("Correct chars/min: " + right.size() / minutes);
+            System.out.println("Correct chars/min: " + numRight / minutes);
         }
 
         System.exit(0);
@@ -97,8 +104,8 @@ public class MorseTutor implements KeyListener {
         frame.setVisible(true);
     }
 
-    private void play(char c) {
-        String morse = Symbols.get(c);
+    private void play(Symbol symbol) {
+        String morse = symbol.getMorse();
         for (int i = 0; i < morse.length(); i++) {
             if ('-' == morse.charAt(i)) {
                 play(line, tone.tone(), dah);
@@ -126,7 +133,7 @@ public class MorseTutor implements KeyListener {
             synchronized (this) {
                 notifyAll();
             }
-        } else if (keyEvent.getKeyChar() == random) {
+        } else if (keyEvent.getKeyChar() == random.getSymbol()) {
             recordCorrect(random, (System.currentTimeMillis() - start));
 
             random = Symbols.getRandom();
@@ -148,16 +155,35 @@ public class MorseTutor implements KeyListener {
         // Intentionally blank
     }
 
-    private void recordCorrect(Character c, long ms) {
-        ArrayList<Integer> list = right.get(c);
+    private void recordCorrect(Symbol symbol, long ms) {
+        Symbols.lowerWeighting(symbol);
+        ArrayList<Integer> list = right.get(symbol.getSymbol());
         if (list == null) list = new ArrayList<Integer>();
         list.add((int) ms);
-        right.put(c, list);
+        right.put(symbol.getSymbol(), list);
     }
 
-    private void recordIncorrect(Character c) {
-        Integer i = wrong.get(c);
+    private void recordIncorrect(Symbol symbol) {
+        Symbols.increaseWeighting(symbol);
+        Integer i = wrong.get(symbol.getSymbol());
         if (i == null) i = 1;
-        wrong.put(c, i + 1);
+        wrong.put(symbol.getSymbol(), i + 1);
     }
+
+    private int getNumRight(Map<Character, ArrayList<Integer>> rightMap) {
+        int ret = 0;
+        for (Map.Entry<Character, ArrayList<Integer>> entry : rightMap.entrySet()) {
+            ret = ret + entry.getValue().size();
+        }
+        return ret;
+    }
+
+    private int getNumWrong(Map<Character, Integer> wrongMap) {
+        int ret = 0;
+        for (Map.Entry<Character, Integer> entry : wrongMap.entrySet()) {
+            ret = ret + entry.getValue();
+        }
+        return ret;
+    }
+
 }
