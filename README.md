@@ -19,16 +19,16 @@ Learn the characters at https://en.wikipedia.org/wiki/Morse_code
 
 ## To run
    * Either: ```mvn clean compile```, then ```./run.sh``` or
-   * Use the precompiled jar: ```java -jar 50 20 800```
+   * Use the precompiled jar: ```java -jar 40 20 800```
 
 Escape to exit, space to repeat a character.
 
 ## Stats
 It times how long it takes you to get the symbol correct.
 When you press escape, it gives you stats of:
-Which symbols you got wrong, and how many times.
-The average time for each symbol.
-Some overall stats. E.g.
+    * Which symbols you got wrong, and how many times.
+    * The average time for each symbol.
+    * Some overall stats. E.g.
 ```
 Start:             Sat Jul 30 17:54:33 BST 2016
 End:               Sat Jul 30 17:57:09 BST 2016
