@@ -19,7 +19,9 @@ Learn the characters at https://en.wikipedia.org/wiki/Morse_code
 
 ## To run
    * Either: ```mvn clean compile```, then ```./run.sh``` or
-   * Use the precompiled jar: ```java -jar 40 20 800```
+   * Use the precompiled jar: ```java -jar morse.jar 40 20 800```
+
+Parameters are: <dit length (ms)> <volume (0-127)> <tone (Hz)> (all are required)
 
 Escape to exit, space to repeat a character.
 
