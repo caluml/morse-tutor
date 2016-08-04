@@ -30,6 +30,8 @@ public class MorseTutor implements KeyListener {
     private Map<Character, Integer> wrong = new HashMap<Character, Integer>();
     private Map<Character, ArrayList<Integer>> right = new HashMap<Character, ArrayList<Integer>>();
 
+    private int keyPresses = 1;
+
     public MorseTutor(int dit, Tone tone) {
         this.dit = dit;
         this.dah = dit * 3.0f;
@@ -143,6 +145,19 @@ public class MorseTutor implements KeyListener {
             recordIncorrect(random);
             play(random);
         }
+
+        if (keyPresses % 10 == 0) {
+            System.out.println("Correct: " + getPercentage() + " %");
+        }
+        keyPresses++;
+    }
+
+    private float getPercentage() {
+        int numRight = getNumRight(right);
+        int numWrong = getNumWrong(wrong);
+
+        if (numRight + numWrong == 0) return 0.0f;
+        return (100f / (numRight + numWrong)) * numRight;
     }
 
     @Override

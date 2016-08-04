@@ -11,6 +11,8 @@ public class Symbols {
 
     private static final List<Symbol> symbols = new ArrayList<Symbol>();
 
+    private static Symbol previousSymbol;
+
     static {
         symbols.add(new Symbol('a', ".-"));
         symbols.add(new Symbol('b', "-..."));
@@ -59,21 +61,26 @@ public class Symbols {
 
     /**
      * Picks a random {@link Symbol}. Symbols with higher weightings will be picked more frequently.
+     * Will not pick the previous symbol.
      *
      * @return a random {@link Symbol}
      */
     public static Symbol getRandom() {
+        List<Symbol> newSymbols = new ArrayList<Symbol>(symbols);
+        newSymbols.remove(previousSymbol);
+
         int tot = 0;
-        for (Symbol s : symbols) {
+        for (Symbol s : newSymbols) {
             tot = tot + s.getWeighting();
         }
 
         int r = random.nextInt(tot);
 
         int cur = 0;
-        for (Symbol s : symbols) {
+        for (Symbol s : newSymbols) {
             cur = cur + s.getWeighting();
             if (cur > r) {
+                previousSymbol = s;
                 return s;
             }
         }
@@ -83,7 +90,7 @@ public class Symbols {
 
     /**
      * Decreases the weighting for a {@link Symbol}
-     *
+     * <p>
      * Used when a symbol has been correctly chosen
      * Will not decrease the weighting below 1
      *
@@ -103,7 +110,7 @@ public class Symbols {
 
     /**
      * Increases the weighting for a {@link Symbol}
-     *
+     * <p>
      * Used when a symbol has been incorrectly chosen
      *
      * @param s the {@link Symbol}
