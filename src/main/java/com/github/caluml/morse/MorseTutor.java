@@ -59,11 +59,6 @@ public class MorseTutor implements KeyListener {
         line.close();
         System.out.println("Exiting thread");
 
-        Set<Map.Entry<Character, Integer>> entries = wrong.entrySet();
-        for (Map.Entry<Character, Integer> m : entries) {
-            System.out.println(m.getKey() + " wrong " + m.getValue() + " times");
-        }
-
         int totalChars = 0;
         for (Map.Entry<Character, ArrayList<Integer>> charTimings : right.entrySet()) {
             int sum = 0;
@@ -73,6 +68,11 @@ public class MorseTutor implements KeyListener {
             }
             System.out.println("Average for " + charTimings.getKey() + ": " +
                     ((float) sum / charTimings.getValue().size()) + " ms (out of " + charTimings.getValue().size() + ")");
+        }
+
+        Set<Map.Entry<Character, Integer>> entries = wrong.entrySet();
+        for (Map.Entry<Character, Integer> m : entries) {
+            System.out.println(m.getKey() + " wrong " + m.getValue() + " times");
         }
 
         long end = System.currentTimeMillis();
