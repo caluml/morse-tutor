@@ -124,4 +124,13 @@ public class Symbols {
             }
         }
     }
+
+    public static Symbol getSymbol(char symbol) {
+        for (Symbol s : symbols) {
+            if (s.getSymbol() == symbol) {
+                return s;
+            }
+        }
+        throw new RuntimeException("Can't find symbol " + symbol);
+    }
 }

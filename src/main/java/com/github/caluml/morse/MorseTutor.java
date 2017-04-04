@@ -12,9 +12,9 @@ import java.util.*;
 public class MorseTutor implements KeyListener {
 
     // https://en.wikipedia.org/wiki/Morse_code#Timing
-    private final float dit;       // dit length in milliseconds
-    private final float dah;       // dah length in milliseconds
-    private final float gap;       // gap length in milliseconds - usually the same as a dit
+    public static float dit;       // dit length in milliseconds
+    public static float dah;       // dah length in milliseconds
+    public static float gap;       // gap length in milliseconds - usually the same as a dit
 
     private final Tone tone;
 
@@ -59,12 +59,10 @@ public class MorseTutor implements KeyListener {
         line.close();
         System.out.println("Exiting thread");
 
-        int totalChars = 0;
         for (Map.Entry<Character, ArrayList<Integer>> charTimings : right.entrySet()) {
             int sum = 0;
             for (int i : charTimings.getValue()) {
                 sum = sum + i;
-                totalChars++;
             }
             System.out.println("Average for " + charTimings.getKey() + ": " +
                     ((float) sum / charTimings.getValue().size()) + " ms (out of " + charTimings.getValue().size() + ")");
@@ -86,8 +84,10 @@ public class MorseTutor implements KeyListener {
             System.out.println("Right:             " + numRight);
             System.out.println("Wrong:             " + numWrong);
             System.out.println("% correct:         " + (100f / (numRight + numWrong)) * numRight);
-            System.out.println("Total chars/min:   " + totalChars / minutes);
+            System.out.println("Total chars/min:   " + (numRight + numWrong) / minutes);
             System.out.println("Correct chars/min: " + numRight / minutes);
+//            System.out.println("Total words/min:   " + (numRight + numWrong) / minutes);
+//            System.out.println("Correct words/min: " + numRight / minutes);
         }
 
         System.exit(0);
@@ -119,7 +119,7 @@ public class MorseTutor implements KeyListener {
         line.drain();
     }
 
-    private void play(SourceDataLine line, byte[] audio, float ms) {
+    public void play(SourceDataLine line, byte[] audio, float ms) {
         ms = Math.min(ms, Tone.SECONDS * 1000);
         float length = Tone.SAMPLE_RATE * ms / 1000;
         line.write(audio, 0, (int) length);
